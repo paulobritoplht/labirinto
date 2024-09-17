@@ -8,7 +8,7 @@ namespace Labirinto
         public int JogadorId { get; }
         private IList<Jogada> jogadas = new List<Jogada>();
         private Stack<Jogada> pilha = new Stack<Jogada>();
-        private IList<Direcao> prioridadeJogadas = new List<Direcao> { Direcao.Direita, Direcao.Baixo, Direcao.Esquerda, Direcao.Cima };
+        private IList<Direcao> prioridadeJogadas = new List<Direcao> { Direcao.Baixo, Direcao.Direita, Direcao.Esquerda, Direcao.Cima };
         private bool empilharProximaJogada = true;
         private Direcao? direcaoSolicitada = null;
         private IList<Posicao> posicoesJaPecorridas { get; set; } = new List<Posicao>();

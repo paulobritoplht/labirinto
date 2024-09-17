@@ -10,7 +10,7 @@ namespace Labirinto
         private IDictionary<int, Color> coresJogado = new Dictionary<int, Color>();
         public Jogo()
         {
-            var caminhoArquivo = $"C:\\Users\\Paulo\\Desktop\\Labirintos\\Nivel1.json";
+            var caminhoArquivo = @$"C:\Users\paulo.brito\source\repos\paulobritoplht\labirinto\Labirintos\Nivel10.json";
             
             var json = System.IO.File.ReadAllText(caminhoArquivo);
 
@@ -132,7 +132,7 @@ namespace Labirinto
                     { 
                         //Trataar quant
                     }
-                    await Task.Delay(2000);
+                    await Task.Delay(50);
 
                 }
             }
