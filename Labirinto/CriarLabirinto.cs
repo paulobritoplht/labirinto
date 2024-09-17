@@ -95,7 +95,7 @@ namespace Labirinto
             var numeroDeColunas = Convert.ToInt32(txtAltura.Text);
 
             var labirinto =
-                new TemplateLabirintos.Labirinto(1, inicialX, inicialY, finalX, finalY, numeroDeColunas, numeroDeLinhas, caminhoValido);
+                new TemplateLabirintos.Labirinto(1, inicialX, finalX, inicialY, finalY, numeroDeColunas, numeroDeLinhas, caminhoValido);
 
             var json = System.Text.Json.JsonSerializer.Serialize(labirinto);
         
