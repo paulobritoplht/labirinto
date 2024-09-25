@@ -13,7 +13,7 @@ namespace Labirinto
         public Jogo()
         {
             InitializeComponent();
-            var caminhoArquivo = @$"C:\Users\paulo.brito\source\repos\paulobritoplht\labirinto\Labirintos\teste46.json";
+            var caminhoArquivo = @$"C:\Users\paulo.brito\source\repos\paulobritoplht\labirinto\Labirintos\teste100.json";
 
             var json = System.IO.File.ReadAllText(caminhoArquivo);
 

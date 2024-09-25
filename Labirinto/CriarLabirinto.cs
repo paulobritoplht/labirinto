@@ -99,7 +99,7 @@ namespace Labirinto
 
             var json = System.Text.Json.JsonSerializer.Serialize(labirinto);
         
-            var caminhoArquivo = $"C:\\Users\\Paulo\\Desktop\\Labirintos\\{nome}.json";
+            var caminhoArquivo = @$"C:\Users\paulo.brito\source\repos\paulobritoplht\labirinto\Labirintos\{nome}.json";
             System.IO.File.WriteAllText(caminhoArquivo, json);
             MessageBox.Show("Labirinto salvo em: " + caminhoArquivo);
 
