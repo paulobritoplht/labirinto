@@ -8,9 +8,10 @@ namespace Labirinto
         private IList<Button> labirinto { get; set; } = new List<Button>();
         private IList<IRobo> jogadores { get; set; } = new List<IRobo>();
         private IDictionary<int, Color> coresJogado = new Dictionary<int, Color>();
+        public IList<ControleJogador> controleJogador = new List<ControleJogador>();    
         public Jogo()
         {
-            var caminhoArquivo = @$"C:\Users\paulo.brito\source\repos\paulobritoplht\labirinto\Labirintos\teste2.json";
+            var caminhoArquivo = @$"C:\Users\paulo.brito\source\repos\paulobritoplht\labirinto\Labirintos\teste45.json";
             
             var json = System.IO.File.ReadAllText(caminhoArquivo);
 
@@ -27,7 +28,7 @@ namespace Labirinto
 
 
             jogadores.Add(new Robo(1));
-            jogadores.Add(new Robo2(2));
+            //jogadores.Add(new Robo2(2));
             //jogadores.Add(new Robo2(3, Servidor));
             //jogadores.Add(new Robo2(4, Servidor));
             //jogadores.Add(new Robo2(5, Servidor));
@@ -110,32 +111,51 @@ namespace Labirinto
             {
                 foreach (var robo in jogadores)
                 {
+                    if(controleJogador.Any(f => f.JogadorId == robo.JogadorId && f.Chegou)) 
+                    {
+                        continue;
+                    }
+
                     try 
                     {
                         var direcao = robo.ProximoMovimento();
                         var direcoesDisponiveis = Servidor.Andar(robo.JogadorId, direcao);
                         robo.AdicionaPosicao(direcoesDisponiveis);
-
                         var posicao = Servidor.RecuperaPosicaoJogador(robo.JogadorId);
+                        MoverJogador(robo, posicao);
 
-                        foreach (var caminho in labirinto.Where(c => c.BackColor.ToString() == coresJogado[robo.JogadorId].ToString()))
+                  
+                        if (direcoesDisponiveis.ChegouNoDestino) 
                         {
-                            caminho.BackColor = Color.White;
+                            controleJogador.First(f => f.JogadorId == robo.JogadorId).Chegou = true;
                         }
-
-                        var caminhoJogador = labirinto.First(c => c.Name == posicao);
-                        caminhoJogador.BackColor = coresJogado[robo.JogadorId];
-
                        
                     } 
                     catch 
-                    { 
-                        //Trataar quant
+                    {
+                        //controleJogador.First(f => f.JogadorId == robo.JogadorId).Observacao = "LOST";
                     }
+
+                    //controleJogador.First(f => f.JogadorId == robo.JogadorId).Passos++;
+
                     await Task.Delay(50);
 
                 }
             }
+        }
+
+        private void MoverJogador(IRobo robo, string posicao) 
+        {
+            //var caminho = labirinto.First(c => c.BackColor.ToString() == coresJogado[robo.JogadorId].ToString());
+            //caminho.BackColor = Color.White;
+
+            foreach (var caminho in labirinto.Where(c => c.BackColor.ToString() == coresJogado[robo.JogadorId].ToString()))
+            {
+                caminho.BackColor = Color.White;
+            }
+
+            var caminhoJogador = labirinto.First(c => c.Name == posicao);
+            caminhoJogador.BackColor = coresJogado[robo.JogadorId];
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -157,5 +177,21 @@ namespace Labirinto
         Direita = 2,
         Baixo = 3,
         Cima = 4
+    }
+
+    public class ControleJogador 
+    {
+        public int JogadorId { get; set; }
+        public bool Chegou { get; set; }
+        public int Passos { get; set; }
+        public string? Observacao { get; set; }
+    }
+
+    public class JogadorPartida 
+    {
+        public IRobo Jogador { get; set; }
+        public int QuantidadePassos { get; set; }
+        public bool Chegou { get; set; }
+        public string? Observacao { get; set; }
     }
 }
