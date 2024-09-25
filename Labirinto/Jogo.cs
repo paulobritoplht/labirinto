@@ -6,28 +6,31 @@ namespace Labirinto
     {
         public Servidor Servidor;
         private IList<Button> labirinto { get; set; } = new List<Button>();
-        private IList<IRobo> jogadores { get; set; } = new List<IRobo>();
+        private IList<JogadorPartida> jogadores { get; set; } = new List<JogadorPartida>();
         private IDictionary<int, Color> coresJogado = new Dictionary<int, Color>();
-        public IList<ControleJogador> controleJogador = new List<ControleJogador>();    
+        public IList<ControleJogador> controleJogador = new List<ControleJogador>();
+        public IList<TextBox> labelJogador = new List<TextBox>();
         public Jogo()
         {
-            var caminhoArquivo = @$"C:\Users\paulo.brito\source\repos\paulobritoplht\labirinto\Labirintos\teste45.json";
-            
+            InitializeComponent();
+            var caminhoArquivo = @$"C:\Users\paulo.brito\source\repos\paulobritoplht\labirinto\Labirintos\teste46.json";
+
             var json = System.IO.File.ReadAllText(caminhoArquivo);
 
             // Desserializa o JSON para o objeto Labirinto
             var labirintoMapa = System.Text.Json.JsonSerializer.Deserialize<TemplateLabirintos.Labirinto>(json);
 
             var mapa1 = new TemplateLabirintos.LabirintoNivel1();
-           
+
 
             //Servidor = new Servidor(new TemplateLabirintos.LabirintoNivel1());
             Servidor = new Servidor(labirintoMapa);
 
-    
 
 
-            jogadores.Add(new Robo(1));
+
+            jogadores.Add(new JogadorPartida { Jogador = new Robo(1) });
+            jogadores.Add(new JogadorPartida { Jogador = new Robo2(2) });
             //jogadores.Add(new Robo2(2));
             //jogadores.Add(new Robo2(3, Servidor));
             //jogadores.Add(new Robo2(4, Servidor));
@@ -37,11 +40,24 @@ namespace Labirinto
             //jogadores.Add(new Robo2(8, Servidor));
             //jogadores.Add(new Robo2(9, Servidor));
 
+            int top = 0;
 
-            foreach (var jogador in jogadores)
+            foreach (var jogadorPartida in jogadores)
             {
-                Servidor.AdicionarJogador(new Jogador { Id = jogador.JogadorId });
-                jogador.AdicionaPosicao(Servidor.RetornaPossibilidadesPosicao(jogador.JogadorId));
+                Servidor.AdicionarJogador(new Jogador { Id = jogadorPartida.Jogador.JogadorId });
+                jogadorPartida.Jogador.AdicionaPosicao(Servidor.RetornaPossibilidadesPosicao(jogadorPartida.Jogador.JogadorId));
+                var label = new TextBox
+                {
+                    Name = jogadorPartida.Jogador.JogadorId.ToString(),
+                    Text = $"{jogadorPartida.Jogador.JogadorId} - Pronto para iniciar",
+                    Top = top,
+                    Width = 200
+                };
+
+                top = top + 30;
+
+                labelJogador.Add(label);
+                panel1.Controls.Add(label);
             }
 
             coresJogado.Add(1, Color.Blue);
@@ -91,7 +107,7 @@ namespace Labirinto
             var caminhoInicial = labirinto.First(l => l.Name == Servidor.Labirinto.CaminhoValido().First().RetornaPosicao());
             caminhoInicial.BackColor = Color.Green;
 
-            InitializeComponent();
+            
         }
 
 
@@ -109,34 +125,36 @@ namespace Labirinto
         {
             for (var i = 0; i < 300; i++)
             {
-                foreach (var robo in jogadores)
+                foreach (var jogadorPartida in jogadores)
                 {
-                    if(controleJogador.Any(f => f.JogadorId == robo.JogadorId && f.Chegou)) 
+                   
+                    var label = labelJogador.First(l => l.Name == jogadorPartida.Jogador.JogadorId.ToString());
+
+                    if (jogadorPartida.Chegou)
                     {
+                        label.Text = $"{jogadorPartida.Jogador.JogadorId} - Passos {jogadorPartida.QuantidadePassos} - CHEGOU";
+
                         continue;
                     }
 
-                    try 
-                    {
-                        var direcao = robo.ProximoMovimento();
-                        var direcoesDisponiveis = Servidor.Andar(robo.JogadorId, direcao);
-                        robo.AdicionaPosicao(direcoesDisponiveis);
-                        var posicao = Servidor.RecuperaPosicaoJogador(robo.JogadorId);
-                        MoverJogador(robo, posicao);
+                    jogadorPartida.QuantidadePassos++;
 
-                  
-                        if (direcoesDisponiveis.ChegouNoDestino) 
-                        {
-                            controleJogador.First(f => f.JogadorId == robo.JogadorId).Chegou = true;
-                        }
-                       
-                    } 
-                    catch 
+
+                    try
                     {
-                        //controleJogador.First(f => f.JogadorId == robo.JogadorId).Observacao = "LOST";
+                        var direcao = jogadorPartida.Jogador.ProximoMovimento();
+                        var direcoesDisponiveis = Servidor.Andar(jogadorPartida.Jogador.JogadorId, direcao);
+                        jogadorPartida.Jogador.AdicionaPosicao(direcoesDisponiveis);
+                        var posicao = Servidor.RecuperaPosicaoJogador(jogadorPartida.Jogador.JogadorId);
+                        MoverJogador(jogadorPartida.Jogador, posicao);
+                        jogadorPartida.Chegou = direcoesDisponiveis.ChegouNoDestino;
+                        label.Text = $"{jogadorPartida.Jogador.JogadorId} - Passos: {jogadorPartida.QuantidadePassos} - {direcao}";
                     }
-
-                    //controleJogador.First(f => f.JogadorId == robo.JogadorId).Passos++;
+                    catch (Exception e)
+                    {
+                        label.Text = $"{jogadorPartida.Jogador.JogadorId} - Passos: {jogadorPartida.QuantidadePassos} LOST";
+                        jogadorPartida.Observacao = "LOST";
+                    }
 
                     await Task.Delay(50);
 
@@ -144,7 +162,7 @@ namespace Labirinto
             }
         }
 
-        private void MoverJogador(IRobo robo, string posicao) 
+        private void MoverJogador(IRobo robo, string posicao)
         {
             //var caminho = labirinto.First(c => c.BackColor.ToString() == coresJogado[robo.JogadorId].ToString());
             //caminho.BackColor = Color.White;
@@ -169,6 +187,11 @@ namespace Labirinto
             // Para ocultar o formulário atual (opcional)
             this.Hide();
         }
+
+        private void panel1_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
     }
 
     public enum Direcao
@@ -189,7 +212,7 @@ namespace Labirinto
 
     public class JogadorPartida 
     {
-        public IRobo Jogador { get; set; }
+        public required IRobo Jogador { get; set; }
         public int QuantidadePassos { get; set; }
         public bool Chegou { get; set; }
         public string? Observacao { get; set; }

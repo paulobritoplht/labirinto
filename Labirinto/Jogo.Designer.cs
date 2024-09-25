@@ -30,6 +30,7 @@
         {
             button1 = new Button();
             button2 = new Button();
+            panel1 = new Panel();
             SuspendLayout();
             // 
             // button1
@@ -44,7 +45,7 @@
             // 
             // button2
             // 
-            button2.Location = new Point(637, 290);
+            button2.Location = new Point(695, 143);
             button2.Name = "button2";
             button2.Size = new Size(75, 23);
             button2.TabIndex = 1;
@@ -52,11 +53,20 @@
             button2.UseVisualStyleBackColor = true;
             button2.Click += button2_Click;
             // 
+            // panel1
+            // 
+            panel1.Location = new Point(416, 195);
+            panel1.Name = "panel1";
+            panel1.Size = new Size(354, 100);
+            panel1.TabIndex = 2;
+            panel1.Paint += panel1_Paint;
+            // 
             // Jogo
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(panel1);
             Controls.Add(button2);
             Controls.Add(button1);
             Name = "Jogo";
@@ -68,5 +78,6 @@
 
         private Button button1;
         private Button button2;
+        private Panel panel1;
     }
 }
